@@ -1,0 +1,21 @@
+# QA artifacts (screenshots, audits)
+qa/
+
+# Source media (kept locally; frames in assets/frames/ are what the site uses)
+assets/hero-dolly.mp4
+assets/manifest.json
+
+# Generation scripts (kept locally for reproduction)
+generate_images.py
+generate_video.py
+mobile_check.py
+mobile_check2.py
+mobile_check3.py
+mobile_full_qa.py
+scroll_frame_qa.py
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.bak
+*~

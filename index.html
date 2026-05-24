@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>בניית תשתיות AI ובוטים עסקיים · עם אפס סיכון</title>
+  <meta name="description" content="פיתוח מערכות AI מותאמות אישית, בוטים לניהול עסק, וסטאק טכנולוגי מתקדם. אפס סיכון: לא מרוצים, לא משלמים." />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Heebo', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            ink: '#0A0A0B',
+            graphite: '#15171A',
+            slate: '#1F232A',
+            line: '#272B33',
+            mute: '#8A8F98',
+            paper: '#F5F6F8',
+            accent: '#3B82F6',
+            accentDeep: '#1E3A8A',
+          },
+          boxShadow: {
+            soft: '0 1px 0 0 rgba(255,255,255,0.04) inset, 0 20px 60px -20px rgba(0,0,0,0.6)',
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    /* Only hide .fade-up when JS is confirmed loaded. Failsafe: if JS/Motion fails, content stays visible. */
+    html:not(.motion-ready) .fade-up { opacity: 1 !important; transform: none !important; }
+    body {
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(59,130,246,0.10), transparent 60%),
+        radial-gradient(900px 500px at 0% 20%, rgba(30,58,138,0.10), transparent 60%),
+        #0A0A0B;
+      color: #F5F6F8;
+      font-feature-settings: "ss01", "ss02";
+      -webkit-font-smoothing: antialiased;
+    }
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(8px);
+    }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse at 50% 0%, #000 40%, transparent 75%);
+    }
+    .hairline { border-color: rgba(255,255,255,0.08); }
+    .fade-up { opacity: 0; transform: translateY(14px); transition: opacity .8s ease, transform .8s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .num-mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+    .focus-ring:focus { outline: none; box-shadow: 0 0 0 2px #3B82F6, 0 0 0 6px rgba(59,130,246,0.18); }
+    .btn-primary {
+      background: linear-gradient(180deg, #2563EB, #1E3A8A);
+      transition: transform .15s ease, box-shadow .25s ease, filter .2s ease;
+    }
+    .btn-primary:hover { filter: brightness(1.08); box-shadow: 0 12px 30px -10px rgba(37,99,235,0.55); }
+    .btn-primary:active { transform: translateY(1px); }
+    .card { transition: transform .35s ease, border-color .35s ease, background .35s ease, box-shadow .35s ease; }
+    .card:hover { transform: translateY(-4px); border-color: rgba(59,130,246,0.35); box-shadow: 0 24px 60px -28px rgba(59,130,246,0.35); }
+    .card img { transition: transform .9s cubic-bezier(0.22, 1, 0.36, 1); }
+    .card:hover img { transform: scale(1.06); }
+    @media (prefers-reduced-motion: reduce) {
+      .fade-up { opacity: 1 !important; transform: none !important; }
+      .card:hover, .card:hover img { transform: none !important; }
+    }
+    .dot::before {
+      content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 9999px;
+      background: #3B82F6; margin-inline-end: 8px; vertical-align: middle;
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
+    }
+    ::selection { background: #1E3A8A; color: #fff; }
+  </style>
+</head>
+<body class="font-sans">
+
+  <!-- Top Nav -->
+  <header class="sticky top-0 z-40 border-b hairline backdrop-blur bg-ink/70">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2 py-2.5 -my-2.5 min-h-[44px] group">
+        <span class="w-7 h-7 rounded-md bg-gradient-to-br from-accent to-accentDeep grid place-items-center text-xs font-bold">AI</span>
+        <span class="text-sm font-semibold tracking-wide text-paper/90">Studio · תשתיות AI</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-8 text-sm text-paper/70">
+        <a href="#services" class="hover:text-paper">שירותים</a>
+        <a href="#work" class="hover:text-paper">עבודות</a>
+        <a href="#guarantee" class="hover:text-paper">אפס סיכון</a>
+        <a href="#process" class="hover:text-paper">תהליך</a>
+        <a href="#contact" class="hover:text-paper">יצירת קשר</a>
+      </nav>
+      <a href="#contact" class="text-sm font-medium px-4 py-2.5 min-h-[44px] flex items-center rounded-md btn-primary focus-ring">הזמן שיחת אפיון</a>
+    </div>
+  </header>
+
+  <!-- Hero (scroll-driven canvas: 80 frames of dolly-in into AI neural field) -->
+  <section id="hero-section" class="relative h-[180vh] md:h-[260vh]">
+    <div class="sticky top-0 h-screen w-full overflow-hidden">
+      <!-- Canvas player -->
+      <canvas id="hero-canvas" class="absolute inset-0 w-full h-full block bg-ink"></canvas>
+      <!-- Static fallback (visible until frames load) -->
+      <img id="hero-fallback" src="assets/hero.jpg" alt="" aria-hidden="true"
+           class="absolute inset-0 w-full h-full object-cover opacity-70" />
+      <!-- Gradients -->
+      <div class="absolute inset-0 bg-gradient-to-b from-ink/30 via-ink/55 to-ink pointer-events-none"></div>
+      <div class="absolute inset-0 bg-gradient-to-l from-transparent via-ink/20 to-ink/60 pointer-events-none"></div>
+      <div class="absolute inset-0 grid-bg opacity-40 pointer-events-none"></div>
+
+      <!-- Hero text overlay -->
+      <div class="absolute inset-0 flex items-center">
+        <div class="max-w-6xl mx-auto px-6 w-full">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs text-paper/70 mb-8 fade-up">
+            <span class="dot"></span>פנוי לפרויקט אחד נוסף ברבעון זה
+          </div>
+
+          <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight fade-up">
+            בניית תשתיות AI ובוטים עסקיים
+            <span class="block bg-gradient-to-l from-paper to-paper/60 bg-clip-text text-transparent">עם אפס סיכון.</span>
+          </h1>
+
+          <p class="mt-7 max-w-2xl text-lg md:text-xl text-paper/70 leading-relaxed fade-up">
+            אני מפתח עבורך מערכות AI מותאמות אישית, כולל בוט טלגרם לניהול העסק.
+            מסירה ראשונית תוך <span class="num-mono text-paper font-semibold">14</span> ימים בלבד, עם <span class="num-mono text-paper font-semibold">3</span> חודשי אחריות מלאה.
+          </p>
+
+          <div class="mt-10 flex flex-col sm:flex-row gap-3 fade-up">
+            <a href="#contact" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-md btn-primary text-paper font-semibold focus-ring">
+              קבע שיחת אפיון של 20 דק׳
+              <svg class="w-4 h-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a href="#services" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-md glass text-paper/90 hover:text-paper focus-ring">
+              מה אני בונה
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-paper/45 text-xs select-none pointer-events-none fade-up" data-scroll-indicator>
+        <span>גלול לחקירה</span>
+        <svg class="w-4 h-4 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust strip (now its own section after the cinematic hero) -->
+  <section class="relative border-t hairline">
+    <div class="max-w-6xl mx-auto px-6 py-10 md:py-14">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-px hairline border rounded-xl overflow-hidden glass fade-up">
+        <div class="p-5">
+          <div class="text-2xl font-bold num-mono"><span data-count="14">14</span> ימים</div>
+          <div class="text-xs text-mute mt-1">מסירה ראשונית</div>
+        </div>
+        <div class="p-5 border-r hairline">
+          <div class="text-2xl font-bold num-mono"><span data-count="3">3</span> חודשים</div>
+          <div class="text-xs text-mute mt-1">אחריות ותמיכה</div>
+        </div>
+        <div class="p-5 md:border-r hairline">
+          <div class="text-2xl font-bold"><span data-count="0">0</span>₪</div>
+          <div class="text-xs text-mute mt-1">אם לא מרוצים</div>
+        </div>
+        <div class="p-5 border-r hairline">
+          <div class="text-2xl font-bold num-mono">24/7</div>
+          <div class="text-xs text-mute mt-1">זמינות הבוט בייצור</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="py-24 md:py-32 border-t hairline">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-2xl fade-up">
+        <div class="text-xs uppercase tracking-[0.18em] text-accent/90 mb-3">השירותים</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">שלושה מנועים. עסק אחד שעובד לבד.</h2>
+        <p class="mt-5 text-paper/65 leading-relaxed">
+          כל פרויקט הוא שילוב של תשתית, אוטומציה ושכבת AI חכמה. בלי כלים גנריים, בלי תלות בספקים.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 mt-14">
+        <!-- Card 1 -->
+        <article class="card glass rounded-2xl overflow-hidden fade-up">
+          <div class="relative aspect-[5/3] overflow-hidden">
+            <img src="assets/card-infrastructure.jpg" alt="תשתית טכנולוגית" loading="lazy"
+                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div class="absolute inset-0 bg-gradient-to-t from-graphite via-graphite/30 to-transparent"></div>
+            <div class="absolute bottom-3 left-3 w-10 h-10 rounded-xl bg-accent/20 backdrop-blur grid place-items-center border hairline">
+              <svg class="w-4.5 h-4.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7l9-4 9 4-9 4-9-4zm0 5l9 4 9-4M3 17l9 4 9-4" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="p-7 pt-6">
+            <h3 class="text-xl font-semibold mb-2">תשתית טכנולוגית</h3>
+            <p class="text-paper/65 leading-relaxed text-[15px]">
+              מערכת CRM ואתר מותאמים אישית לעסק שלך. בסיס נתונים אמיתי, ממשק ניהול, ובסיס שצומח איתך.
+            </p>
+            <ul class="mt-5 space-y-2 text-sm text-paper/70">
+              <li class="flex gap-2"><span class="text-accent">›</span>סכימת DB מותאמת לזרימת העבודה</li>
+              <li class="flex gap-2"><span class="text-accent">›</span>פאנל אדמין עם תפקידים והרשאות</li>
+              <li class="flex gap-2"><span class="text-accent">›</span>פריסה אוטומטית לייצור</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="card glass rounded-2xl overflow-hidden fade-up" style="transition-delay: .05s">
+          <div class="relative aspect-[5/3] overflow-hidden">
+            <img src="assets/card-ai-core.jpg" alt="Personal AI" loading="lazy"
+                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div class="absolute inset-0 bg-gradient-to-t from-graphite via-graphite/30 to-transparent"></div>
+            <div class="absolute bottom-3 left-3 w-10 h-10 rounded-xl bg-accent/20 backdrop-blur grid place-items-center border hairline">
+              <svg class="w-4.5 h-4.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M5.6 18.4l2.1-2.1M12 21v-3M18.4 18.4l-2.1-2.1M21 12h-3M18.4 5.6l-2.1 2.1" stroke-linecap="round"/><circle cx="12" cy="12" r="3.5"/></svg>
+            </div>
+          </div>
+          <div class="p-7 pt-6">
+            <h3 class="text-xl font-semibold mb-2">ה-Personal AI שלך</h3>
+            <p class="text-paper/65 leading-relaxed text-[15px]">
+              בוט טלגרם חכם שמדבר עם המערכות שלך, מנהל נתונים בזמן אמת, ועונה לך בשפה טבעית מהכיס.
+            </p>
+            <ul class="mt-5 space-y-2 text-sm text-paper/70">
+              <li class="flex gap-2"><span class="text-accent">›</span>חיבור חי ל-CRM, לדוחות ולמלאי</li>
+              <li class="flex gap-2"><span class="text-accent">›</span>פקודות בעברית, בלי תפריטים</li>
+              <li class="flex gap-2"><span class="text-accent">›</span>שכבת אבטחה לפי משתמש</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="card glass rounded-2xl overflow-hidden fade-up" style="transition-delay: .1s">
+          <div class="relative aspect-[5/3] overflow-hidden">
+            <img src="assets/card-stack.jpg" alt="סטאק טכנולוגי" loading="lazy"
+                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div class="absolute inset-0 bg-gradient-to-t from-graphite via-graphite/30 to-transparent"></div>
+            <div class="absolute bottom-3 left-3 w-10 h-10 rounded-xl bg-accent/20 backdrop-blur grid place-items-center border hairline">
+              <svg class="w-4.5 h-4.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3" stroke-linecap="round"/><path d="M9 9h6v6H9z"/></svg>
+            </div>
+          </div>
+          <div class="p-7 pt-6">
+            <h3 class="text-xl font-semibold mb-2">סטאק טכנולוגי מתקדם</h3>
+            <p class="text-paper/65 leading-relaxed text-[15px]">
+              Supabase, Edge Functions, קוד נקי וביצועים גבוהים. ארכיטקטורה שמחזיקה אלפי משתמשים בלי לפרק אותך בעלויות.
+            </p>
+            <ul class="mt-5 space-y-2 text-sm text-paper/70">
+              <li class="flex gap-2"><span class="text-accent">›</span>Postgres + RLS לאבטחת נתונים</li>
+              <li class="flex gap-2"><span class="text-accent">›</span>Edge Functions לאוטומציה</li>
+              <li class="flex gap-2"><span class="text-accent">›</span>תיעוד, גיבויים ובדיקות</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Work / Proof -->
+  <section id="work" class="py-24 md:py-32 border-t hairline">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 fade-up">
+        <div class="max-w-2xl">
+          <div class="text-xs uppercase tracking-[0.18em] text-accent/90 mb-3">עבודות נבחרות</div>
+          <h2 class="text-3xl md:text-5xl font-bold tracking-tight">לא תאוריה. דברים שכבר עובדים.</h2>
+        </div>
+        <p class="text-paper/65 md:max-w-sm leading-relaxed">
+          שלוש דוגמאות שמסבירות איך אני חושב על AI ועל אוטומציה עסקית בעולם האמיתי.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 mt-14">
+
+        <!-- Work 1: Miluim + NGOs -->
+        <article class="card glass rounded-2xl p-7 fade-up flex flex-col">
+          <div class="flex items-center gap-3 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-accent/10 text-accent border border-accent/30">פרו-בונו</span>
+            <span class="text-mute">2025-2026</span>
+          </div>
+          <h3 class="text-xl font-semibold mt-5 leading-snug">
+            תכני AI אישיים ללוחמי מילואים ולעמותות
+          </h3>
+          <p class="text-paper/65 leading-relaxed text-[15px] mt-3">
+            בניתי פייפליין שמייצר סרטונים אישיים לילדים של לוחמי מילואים, ותשתיות תוכן לעמותות חברתיות. מילים של אבא מהמילואים הופכות לסרט שהילד רואה בבית.
+          </p>
+          <ul class="mt-5 space-y-2 text-sm text-paper/70">
+            <li class="flex gap-2"><span class="text-accent">›</span>פייפליין אוטומטי מהקלטה לסרטון מוגמר</li>
+            <li class="flex gap-2"><span class="text-accent">›</span>תשתית לאלפי הפקות במקביל</li>
+            <li class="flex gap-2"><span class="text-accent">›</span>תרומה חברתית, לא תשלום</li>
+          </ul>
+          <div class="mt-auto pt-6 text-xs text-mute border-t hairline mt-6">
+            <span class="dot"></span>פעיל
+          </div>
+        </article>
+
+        <!-- Work 2: Influencer + Contractor network -->
+        <article class="card glass rounded-2xl p-7 fade-up flex flex-col" style="transition-delay:.05s">
+          <div class="flex items-center gap-3 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-accent/10 text-accent border border-accent/30">B2B</span>
+            <span class="text-mute">2026</span>
+          </div>
+          <h3 class="text-xl font-semibold mt-5 leading-snug">
+            מערכת ניהול למשפיע מרשת הקבלנים
+          </h3>
+          <p class="text-paper/65 leading-relaxed text-[15px] mt-3">
+            בניתי CRM ייעודי + בוט שמדבר עם המערכת בזמן אמת. הוא רואה את כל הלידים, השלבים, ההחלטות, גם מהמכונית. בלי לפתוח לפטופ.
+          </p>
+          <ul class="mt-5 space-y-2 text-sm text-paper/70">
+            <li class="flex gap-2"><span class="text-accent">›</span>בוט אישי שמדבר עם ה-CRM בעברית</li>
+            <li class="flex gap-2"><span class="text-accent">›</span>לידים נכנסים אוטומטית עם תיוג</li>
+            <li class="flex gap-2"><span class="text-accent">›</span>החלטות מהירות מהשטח</li>
+          </ul>
+          <div class="mt-auto pt-6 text-xs text-mute border-t hairline mt-6">
+            <span class="dot"></span>בייצור
+          </div>
+        </article>
+
+        <!-- Work 3: AI Workshops -->
+        <article class="card glass rounded-2xl p-7 fade-up flex flex-col" style="transition-delay:.1s">
+          <div class="flex items-center gap-3 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-accent/10 text-accent border border-accent/30">הדרכה</span>
+            <span class="text-mute">2025-2026</span>
+          </div>
+          <h3 class="text-xl font-semibold mt-5 leading-snug">
+            סדנאות AI לעסקים ולמתכנתים
+          </h3>
+          <p class="text-paper/65 leading-relaxed text-[15px] mt-3">
+            העברתי סדנאות מעשיות שמראות איך להתחיל לעבוד עם AI. מבעיה אמיתית לפיתרון אמיתי תוך שעות, לא חודשים. בלי הייפ, רק כלים שעובדים.
+          </p>
+          <ul class="mt-5 space-y-2 text-sm text-paper/70">
+            <li class="flex gap-2"><span class="text-accent">›</span>סדנאות עם תוצרים אמיתיים בסוף</li>
+            <li class="flex gap-2"><span class="text-accent">›</span>התאמה לקהל: עסק / טכני</li>
+            <li class="flex gap-2"><span class="text-accent">›</span>חומר שמכין לעבודה היומיומית</li>
+          </ul>
+          <div class="mt-auto pt-6 text-xs text-mute border-t hairline mt-6">
+            <span class="dot"></span>זמין להזמנה
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Zero Risk Guarantee -->
+  <section id="guarantee" class="py-24 md:py-32 border-t hairline">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-12 gap-10 items-start">
+        <div class="md:col-span-5 fade-up">
+          <div class="text-xs uppercase tracking-[0.18em] text-accent/90 mb-3">אפס סיכון</div>
+          <h2 class="text-3xl md:text-5xl font-bold tracking-tight leading-tight">
+            לא מרוצים.<br/>
+            <span class="bg-gradient-to-l from-paper to-paper/55 bg-clip-text text-transparent">לא משלמים.</span>
+          </h2>
+          <p class="mt-6 text-paper/70 leading-relaxed">
+            אני לוקח על עצמי את הסיכון של הפרויקט. אם בסוף שלב המסירה אתה לא מרגיש שזה שווה כל שקל, אתה לא חייב לי דבר. נקודה.
+          </p>
+        </div>
+
+        <div class="md:col-span-7 grid sm:grid-cols-3 gap-4">
+          <div class="glass rounded-2xl p-6 fade-up">
+            <div class="text-3xl font-bold num-mono">01</div>
+            <div class="mt-3 font-semibold">אפיון ללא עלות</div>
+            <p class="mt-2 text-sm text-paper/60 leading-relaxed">שיחה ראשונית עם הצעה ברורה, לוחות זמנים והגדרת הצלחה.</p>
+          </div>
+          <div class="glass rounded-2xl p-6 fade-up" style="transition-delay:.05s">
+            <div class="text-3xl font-bold num-mono">02</div>
+            <div class="mt-3 font-semibold">מסירה תוך 14 ימים</div>
+            <p class="mt-2 text-sm text-paper/60 leading-relaxed">גרסה עובדת בייצור, לא mockup. אם זה לא עומד בהבטחה, לא תשלם.</p>
+          </div>
+          <div class="glass rounded-2xl p-6 fade-up" style="transition-delay:.1s">
+            <div class="text-3xl font-bold num-mono">03</div>
+            <div class="mt-3 font-semibold">3 חודשי אחריות</div>
+            <p class="mt-2 text-sm text-paper/60 leading-relaxed">תיקוני באגים, התאמות קטנות וייעוץ שוטף. בלי שעון מונה.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process -->
+  <section id="process" class="py-24 md:py-28 border-t hairline">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="max-w-2xl fade-up">
+        <div class="text-xs uppercase tracking-[0.18em] text-accent/90 mb-3">איך זה עובד</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight">תהליך קצר, צפוי, בלי הפתעות.</h2>
+      </div>
+
+      <ol class="mt-12 grid md:grid-cols-4 gap-6">
+        <li class="glass rounded-2xl p-6 fade-up">
+          <div class="text-accent text-xs font-semibold mb-2">יום 1</div>
+          <h3 class="font-semibold">אפיון</h3>
+          <p class="text-sm text-paper/60 mt-2">שיחת זום, מיפוי תהליכים, הצעת מחיר מדויקת.</p>
+        </li>
+        <li class="glass rounded-2xl p-6 fade-up" style="transition-delay:.05s">
+          <div class="text-accent text-xs font-semibold mb-2">ימים 2 עד 4</div>
+          <h3 class="font-semibold">תשתית</h3>
+          <p class="text-sm text-paper/60 mt-2">הקמת DB, פריסה, חיבור שירותים.</p>
+        </li>
+        <li class="glass rounded-2xl p-6 fade-up" style="transition-delay:.1s">
+          <div class="text-accent text-xs font-semibold mb-2">ימים 5 עד 12</div>
+          <h3 class="font-semibold">פיתוח</h3>
+          <p class="text-sm text-paper/60 mt-2">בניית הבוט, הלוגיקה וה-CRM. שקיפות מלאה.</p>
+        </li>
+        <li class="glass rounded-2xl p-6 fade-up" style="transition-delay:.15s">
+          <div class="text-accent text-xs font-semibold mb-2">יום 14</div>
+          <h3 class="font-semibold">מסירה</h3>
+          <p class="text-sm text-paper/60 mt-2">העלאה לייצור, הדרכה, ותחילת אחריות.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-24 md:py-32 border-t hairline">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-center fade-up">
+        <div class="text-xs uppercase tracking-[0.18em] text-accent/90 mb-3">צור קשר</div>
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">ספר לי על האתגר.</h2>
+        <p class="mt-5 text-paper/65">תשובה אישית תוך 24 שעות. אם זה לא מתאים, אגיד לך בכנות.</p>
+      </div>
+
+      <form id="leadForm" class="mt-12 glass rounded-2xl p-6 md:p-8 space-y-5 fade-up" novalidate>
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <label for="name" class="block text-sm font-medium text-paper/80 mb-2">שם מלא</label>
+            <input id="name" name="name" type="text" required
+                   class="w-full bg-slate/60 border hairline rounded-lg px-4 py-3 text-paper placeholder:text-mute focus-ring"
+                   placeholder="ישראל ישראלי" />
+          </div>
+          <div>
+            <label for="phone" class="block text-sm font-medium text-paper/80 mb-2">טלפון</label>
+            <input id="phone" name="phone" type="tel" required dir="ltr"
+                   class="w-full bg-slate/60 border hairline rounded-lg px-4 py-3 text-paper placeholder:text-mute focus-ring"
+                   placeholder="054-0000000" />
+          </div>
+        </div>
+        <div>
+          <label for="challenge" class="block text-sm font-medium text-paper/80 mb-2">תיאור קצר של האתגר</label>
+          <textarea id="challenge" name="challenge" rows="4" required
+                    class="w-full bg-slate/60 border hairline rounded-lg px-4 py-3 text-paper placeholder:text-mute focus-ring resize-none"
+                    placeholder="מה הכאב? מה היית רוצה שהמערכת תעשה במקומך?"></textarea>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
+          <p class="text-xs text-mute">שליחת הטופס פותחת WhatsApp עם הפרטים. אצור איתך קשר תוך 24 שעות.</p>
+          <button type="submit"
+                  class="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] rounded-md btn-primary font-semibold focus-ring">
+            שלח דרך WhatsApp
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.4.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2.1-.3 0-.5 0-.1-.6-1.4-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.6-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.5-.4zM12 2.2C6.6 2.2 2.2 6.6 2.2 12c0 1.7.5 3.4 1.3 4.9L2 22l5.3-1.4c1.4.8 3 1.2 4.7 1.2 5.4 0 9.8-4.4 9.8-9.8s-4.4-9.8-9.8-9.8zm0 17.8c-1.5 0-2.9-.4-4.2-1.1l-.3-.2-3.1.8.8-3-.2-.3c-.8-1.3-1.2-2.8-1.2-4.3 0-4.5 3.7-8.2 8.2-8.2s8.2 3.7 8.2 8.2-3.7 8.1-8.2 8.1z"/></svg>
+          </button>
+        </div>
+
+        <div id="formStatus" class="hidden text-sm rounded-lg p-3"></div>
+
+        <!-- Direct WhatsApp shortcut -->
+        <div class="pt-4 border-t hairline">
+          <a href="https://wa.me/972549116092?text=%D7%94%D7%99%D7%99%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%94%D7%90%D7%AA%D7%A8.%20%D7%90%D7%A0%D7%99%20%D7%9E%D7%A2%D7%95%D7%A0%D7%99%D7%99%D7%9F%20%D7%9C%D7%A9%D7%9E%D7%95%D7%A2%20%D7%A2%D7%9C%20%D7%A4%D7%99%D7%AA%D7%95%D7%97%20AI%20%D7%9C%D7%A2%D7%A1%D7%A7" target="_blank" rel="noopener"
+             class="inline-flex items-center justify-center gap-2 w-full sm:w-auto text-sm text-paper/80 hover:text-paper min-h-[44px] px-3 py-2 rounded-md hover:bg-paper/5">
+            <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.4.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2.1-.3 0-.5 0-.1-.6-1.4-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.6-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.5-.4zM12 2.2C6.6 2.2 2.2 6.6 2.2 12c0 1.7.5 3.4 1.3 4.9L2 22l5.3-1.4c1.4.8 3 1.2 4.7 1.2 5.4 0 9.8-4.4 9.8-9.8s-4.4-9.8-9.8-9.8z"/></svg>
+            או פשוט לחץ כאן להתחיל שיחת WhatsApp ישירה
+          </a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t hairline">
+    <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-mute">
+      <div class="flex items-center gap-2">
+        <span class="w-6 h-6 rounded-md bg-gradient-to-br from-accent to-accentDeep grid place-items-center text-[10px] font-bold text-paper">AI</span>
+        <span>Studio · תשתיות AI ובוטים עסקיים</span>
+      </div>
+      <div class="num-mono">© <span id="year"></span> · כל הזכויות שמורות</div>
+    </div>
+  </footer>
+
+  <!-- Motion: Framer Motion for the web (motion.dev) -->
+  <script type="module">
+    import { animate, scroll, inView, stagger } from "https://cdn.jsdelivr.net/npm/motion@11.18.0/+esm";
+
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Activate the fade-up initial state ONLY after Motion is confirmed loaded.
+    document.documentElement.classList.add('motion-ready');
+
+    if (!reduce) {
+      // 1) Hero entrance — stagger fade-up
+      const hero = document.getElementById('hero-section');
+      const heroItems = hero ? hero.querySelectorAll('.fade-up') : [];
+      if (heroItems.length) {
+        heroItems.forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(20px)'; });
+        animate(
+          heroItems,
+          { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0px)'] },
+          { delay: stagger(0.1, { start: 0.15 }), duration: 0.9, easing: [0.22, 1, 0.36, 1] }
+        );
+      }
+
+      // 2) Hero canvas — scroll-driven frame playback (dolly-in)
+      const canvas = document.getElementById('hero-canvas');
+      const fallback = document.getElementById('hero-fallback');
+      const FRAME_COUNT = 80;
+      const framePath = (i) => `assets/frames/f-${String(i).padStart(3, '0')}.jpg`;
+
+      if (canvas && hero) {
+        const ctx = canvas.getContext('2d', { alpha: false });
+        const frames = new Array(FRAME_COUNT);
+        let loaded = 0;
+        let lastDrawn = -1;
+        let canvasWidth = 0, canvasHeight = 0;
+
+        function sizeCanvas() {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const rect = canvas.getBoundingClientRect();
+          canvasWidth = rect.width;
+          canvasHeight = rect.height;
+          canvas.width = Math.round(rect.width * dpr);
+          canvas.height = Math.round(rect.height * dpr);
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.scale(dpr, dpr);
+          lastDrawn = -1;
+          drawFrame(currentIdx());
+        }
+
+        function currentIdx() {
+          const r = hero.getBoundingClientRect();
+          const dist = Math.max(1, hero.offsetHeight - window.innerHeight);
+          const p = Math.max(0, Math.min(1, (-r.top) / dist));
+          return Math.round(p * (FRAME_COUNT - 1));
+        }
+
+        function drawFrame(idx) {
+          const img = frames[idx];
+          if (!img || !img.complete || img.naturalWidth === 0) return;
+          if (idx === lastDrawn) return;
+          const cw = canvasWidth, ch = canvasHeight;
+          const iw = img.naturalWidth, ih = img.naturalHeight;
+          const scale = Math.max(cw / iw, ch / ih);
+          const dw = iw * scale, dh = ih * scale;
+          const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
+          ctx.drawImage(img, dx, dy, dw, dh);
+          lastDrawn = idx;
+        }
+
+        for (let i = 1; i <= FRAME_COUNT; i++) {
+          const img = new Image();
+          img.decoding = 'async';
+          img.src = framePath(i);
+          img.onload = () => {
+            loaded++;
+            if (i === 1) drawFrame(0);
+            if (loaded === FRAME_COUNT) {
+              if (fallback) {
+                fallback.style.transition = 'opacity .6s ease';
+                fallback.style.opacity = '0';
+                setTimeout(() => fallback.remove(), 700);
+              }
+              drawFrame(currentIdx());
+            }
+          };
+          frames[i - 1] = img;
+        }
+
+        sizeCanvas();
+        window.addEventListener('resize', sizeCanvas);
+
+        let ticking = false;
+        const heroText = hero.querySelector('.absolute.inset-0.flex.items-center');
+        const scrollIndicator = hero.querySelector('[data-scroll-indicator]');
+
+        function onScrollFrame() {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(() => {
+            drawFrame(currentIdx());
+            // overlay fade based on progress
+            const r = hero.getBoundingClientRect();
+            const dist = Math.max(1, hero.offsetHeight - window.innerHeight);
+            const p = Math.max(0, Math.min(1, (-r.top) / dist));
+            if (heroText) heroText.style.opacity = p < 0.7 ? 1 : Math.max(0, 1 - (p - 0.7) / 0.3);
+            if (scrollIndicator) scrollIndicator.style.opacity = p < 0.04 ? 1 : Math.max(0, 1 - (p - 0.04) / 0.18);
+            ticking = false;
+          });
+        }
+        window.addEventListener('scroll', onScrollFrame, { passive: true });
+      }
+
+      // 3) All other .fade-up sections — reveal on enter viewport
+      document.querySelectorAll('section:not(#hero-section) .fade-up').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(18px)';
+        inView(el, () => {
+          animate(el, { opacity: [0, 1], transform: ['translateY(18px)', 'translateY(0px)'] }, {
+            duration: 0.8, easing: [0.22, 1, 0.36, 1]
+          });
+          return () => {};
+        }, { amount: 0.15 });
+      });
+
+      // 4) Count-up on stat numbers
+      document.querySelectorAll('[data-count]').forEach(el => {
+        const end = parseFloat(el.dataset.count);
+        if (!isFinite(end)) return;
+        el.textContent = '0';
+        inView(el, () => {
+          animate(0, end, {
+            duration: 1.4,
+            easing: [0.22, 1, 0.36, 1],
+            onUpdate(v) { el.textContent = String(Math.round(v)); }
+          });
+          return () => {};
+        }, { amount: 0.6 });
+      });
+    } else {
+      // prefers-reduced-motion: ensure everything visible immediately
+      document.querySelectorAll('.fade-up').forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
+    }
+  </script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const WHATSAPP_NUMBER = '972549116092';
+    const form = document.getElementById('leadForm');
+    const status = document.getElementById('formStatus');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = form.name.value.trim();
+      const phone = form.phone.value.trim();
+      const challenge = form.challenge.value.trim();
+      status.classList.remove('hidden', 'bg-red-500/10', 'text-red-300', 'bg-emerald-500/10', 'text-emerald-300');
+
+      if (!name || !phone || !challenge) {
+        status.textContent = 'נא למלא את כל השדות.';
+        status.classList.add('bg-red-500/10', 'text-red-300');
+        return;
+      }
+      if (!/^[\d\-\+\s\(\)]{7,}$/.test(phone)) {
+        status.textContent = 'מספר טלפון לא תקין.';
+        status.classList.add('bg-red-500/10', 'text-red-300');
+        return;
+      }
+
+      // Compose WhatsApp message and open
+      const text =
+        `שלום, פנייה חדשה מהאתר:\n\n` +
+        `*שם:* ${name}\n` +
+        `*טלפון:* ${phone}\n` +
+        `*האתגר:* ${challenge}\n\n` +
+        `נשלח מ-AI Studio Landing`;
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank', 'noopener');
+
+      status.innerHTML = 'תודה. נפתח WhatsApp עם הפנייה — לחץ <strong>שלח</strong> שם ואחזור אליך תוך 24 שעות.';
+      status.classList.add('bg-emerald-500/10', 'text-emerald-300');
+      form.reset();
+    });
+  </script>
+</body>
+</html>
